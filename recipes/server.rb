@@ -64,7 +64,7 @@ service "keystone" do
   service_name platform_options["keystone_service"]
   supports :status => true, :restart => true
   action [ :enable ]
-  notifies :run, resources(:execute => "Keystone: sleep"), :immediately
+  notifies :run, "execute['Keystone: sleep']", :immediately
 end
 
 directory "/etc/keystone" do
@@ -105,8 +105,8 @@ template "/etc/keystone/keystone.conf" do
             :use_syslog => node["keystone"]["syslog"]["use"],
             :log_facility => node["keystone"]["syslog"]["facility"]
             )
-  notifies :run, resources(:execute => "keystone-manage db_sync"), :immediately
-  notifies :restart, resources(:service => "keystone"), :immediately
+  notifies :run, "execute['keystone-manage db_sync']", :immediately
+  notifies :restart, "service[keystone]", :immediately
 end
 
 template "/etc/keystone/logging.conf" do
@@ -114,7 +114,7 @@ template "/etc/keystone/logging.conf" do
   owner "root"
   group "root"
   mode "0644"
-  notifies :restart, resources(:service => "keystone"), :immediately
+  notifies :restart, "service[keystone]", :immediately
 end
 
 #TODO(shep): this should probably be derived from keystone.users hash keys
